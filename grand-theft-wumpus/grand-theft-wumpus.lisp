@@ -1,4 +1,4 @@
-(load "graphs/graph-util.lisp")
+(load "../graphs/graph-util.lisp")
 
 ;; Data
 (defparameter *congestion-city-nodes* nil)
