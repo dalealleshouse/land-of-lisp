@@ -5,6 +5,7 @@
 (defparameter *congestion-city-edges* nil)
 (defparameter *visited-nodes* nil)
 (defparameter *player-pos* nil)
+(defparameter *move-count* 0)
 (defparameter *node-num* 30)
 (defparameter *edge-num* 45)
 (defparameter *worm-num* 3)
@@ -43,8 +44,8 @@
     visited))
 
 ; set-difference returns all items that are in the first list but not the second
-; let* allows us to referance previously defined variable, if we used let, 
-; the referance to connected in the assignment of unconnected would cause an error
+; let* allows us to reference previously defined variable, if we used let, 
+; the reference to connected in the assignment of unconnected would cause an error
 (defun find-islands (nodes edge-list)
   (let ((islands nil))
     (labels ((find-island (nodes)
@@ -192,12 +193,20 @@
                         (not (member pos *visited-nodes*)))))
     (pushnew pos *visited-nodes*)
     (setf *player-pos* pos)
+    (setf *move-count* (1+ *move-count*))
     (draw-known-city)
-    (cond ((member 'cops edge) (princ "You ran into the cops. Game Over."))
+    (cond ((member 'cops edge) (princ "You ran into the cops. Game Over. Loser..."))
           ((member 'wumpus node) (if charging
-                                     (princ "You found the Wumpus!")
-                                   (princ "You run into the Wumpus!")))
-          (charging (princ "You wated your last bullet. Game Over."))
+                                     (progn
+                                       (princ "You found the Wumpus!")
+                                       (princ (fresh-line))
+                                       (princ (format t "~$" (/ (length *congestion-city-nodes*) (length *visited-nodes*))))
+                                       (princ "\% visited.")
+                                       (princ (fresh-line))
+                                       (princ *move-count*)
+                                       (princ " moves!"))
+                                   (princ "You ran into the Wumpus! Game Over. Loser...")))
+          (charging (princ "You wasted your last bullet. Game Over. Loser..."))
           (has-worm (let ((new-pos (random-node)))
                       (princ "You ran into a Glow Worm Gang! Your now at ")
                       (princ new-pos)
